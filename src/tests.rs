@@ -4,10 +4,10 @@ use crate::serial::*;
 
 #[test]
 fn test_key1() {
-  let key1 = Key::new("123456");
-  let key2 = Key::new("123456");
-  let key3 = Key::new("1234567");
-  let key4 = Key::new("123457");
+  let key1 = Key::from("123456");
+  let key2 = Key::from("123456");
+  let key3 = Key::from("1234567");
+  let key4 = Key::from("123457");
 
   assert_eq!(key1, key2);
   assert_ne!(key1, key3);
@@ -20,7 +20,7 @@ fn test_key1() {
 #[test]
 fn test_stream1() {
   const PATH: &str = "users/test-stream-1.tmp";
-  let key = Key::new("123456");
+  let key = Key::from("123456");
   let key2: Key;
 
   {
@@ -41,8 +41,8 @@ fn test_stream1() {
 #[test]
 fn test_stream2() {
   const PATH: &str = "users/test-stream-2.tmp";
-  let key1 = Key::new("123456");
-  let key2 = Key::new("654321");
+  let key1 = Key::from("123456");
+  let key2 = Key::from("654321");
   let key3: Key;
 
   {
@@ -69,12 +69,12 @@ fn test_stream3() {
   let msg2: String;
 
   {
-    let mut ostream = OutputStream::new(PATH, Key::new("123456")).unwrap();
+    let mut ostream = OutputStream::new(PATH, Key::from("123456")).unwrap();
     ostream.write(&msg).unwrap();
   }
 
   {
-    let mut istream = InputStream::new(PATH, Key::new("123456")).unwrap();
+    let mut istream = InputStream::new(PATH, Key::from("123456")).unwrap();
     msg2 = istream.read().unwrap();
   }
   

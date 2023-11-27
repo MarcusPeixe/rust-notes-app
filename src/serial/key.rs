@@ -10,7 +10,7 @@ pub struct Key {
 }
 
 impl Key {
-  pub fn new(password: &str) -> Key {
+  pub fn from(password: &str) -> Key {
     let mut value: u64 = INITIAL;
     for c in password.bytes() {
       value = (value.wrapping_mul(MULT)).wrapping_add(

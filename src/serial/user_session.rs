@@ -10,9 +10,9 @@ impl UserSession {
   pub fn authenticate(username: &str, password: &str) -> Option<UserSession> {
     let filename: &str = &format!("users/{}.data", username);
 
-    let key = Key::new(password);
+    let key = Key::from(password);
     let mut istream = InputStream::new(filename, key)?;
-    let key_user: Key = istream.read()?;
+    let key_user = istream.read::<Key>()?;
     
     // Check if keys match (password is correct)
     if key == key_user {
@@ -35,7 +35,7 @@ impl UserSession {
       return None;
     }
 
-    let key = Key::new(password);
+    let key = Key::from(password);
     let mut ostream = OutputStream::new(filename, key)?;
     ostream.write(&key)?;
 
@@ -45,22 +45,18 @@ impl UserSession {
     })
   }
 
-  pub fn istream(&self) -> Option<InputStream> {
+  pub fn get_istream(&self) -> Option<InputStream> {
     let key: Key;
     let mut istream = InputStream::new(
       &format!("users/{}.data", self.username), self.key
     )?;
     key = istream.read()?;
     
-    if key == self.key {
-      Some(istream)
-    }
-    else {
-      None
-    }
+    assert_eq!(key, self.key);
+    Some(istream)
   }
 
-  pub fn ostream(&self) -> Option<OutputStream> {
+  pub fn get_ostream(&self) -> Option<OutputStream> {
     let mut ostream = OutputStream::new(
       &format!("users/{}.data", self.username), self.key
     )?;

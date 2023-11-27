@@ -15,9 +15,9 @@ fn readline(prompt: &str) -> String {
   }
 }
 
-fn scan<T>(prompt: &str) -> T where T: std::str::FromStr {
+fn input<T>(prompt: &str) -> T where T: std::str::FromStr {
   loop {
-    let x: Option<T> = readline(prompt).parse().ok();
+    let x = readline(prompt).parse::<T>().ok();
     if let Some(x) = x {
       return x;
     }
@@ -27,17 +27,17 @@ fn scan<T>(prompt: &str) -> T where T: std::str::FromStr {
 
 fn change_message(user: &UserSession) {
   let message = readline("Type message: ");
-  let mut ostream = user.ostream().unwrap();
-  if message.len() > 0 {
+  let mut ostream = user.get_ostream().unwrap();
+  if message != "" {
     ostream.write(&message).unwrap();
   }
 }
 
 fn main_menu(user: &UserSession) {
   loop {
-    let msg = match user.istream().unwrap().read::<String>() {
-      Some(msg) => format!("Message: '{}'", msg),
-      None => "* No message *".to_string(),
+    let msg = match user.get_istream().unwrap().read::<String>() {
+      Some(text) => format!("Message: '{}'", text),
+      None => String::from("* No message *"),
     };
     print!(
       "\n\n\n=== MENU ===\n\
@@ -49,7 +49,7 @@ fn main_menu(user: &UserSession) {
       \n",
       msg
     );
-    let option: i32 = scan("Option: ");
+    let option: i32 = input("Option: ");
     match option {
       1 => change_message(user),
       0 => break,
@@ -95,12 +95,12 @@ pub fn start() {
     print!(
       "\n\n\n=== MENU ===\n\
       \n\
-      1. Login\n\
-      2. Signup\n\
+      1. Log in\n\
+      2. Sign up\n\
       0. Exit\n\
       \n"
     );
-    let option: i32 = scan("Option: ");
+    let option: i32 = input("Option: ");
     match option {
       1 => login(),
       2 => signup(),
