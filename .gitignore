@@ -1,5 +1,5 @@
 /.vscode/
 /target/
 /users/*
-!/users/teste.data
+!/users/test.data
 
