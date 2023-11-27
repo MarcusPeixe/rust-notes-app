@@ -2,31 +2,31 @@ use std::io::Write;
 
 use crate::serial::{self, UserSession};
 
-fn readline() -> String {
+fn readline(prompt: &str) -> String {
   let mut line = String::new();
   loop {
+    print!("{}", prompt);
+    std::io::stdout().flush().unwrap();
     let res = std::io::stdin().read_line(&mut line).ok();
     if res.is_some() {
       return line.trim().to_string();
     }
-    println!("\x1B[1;31mInvalid input!\x1B[m");
+    println!("\x1B[0;1;31mInvalid input!\x1B[m");
   }
 }
 
-fn scan<T>() -> T where T: std::str::FromStr {
+fn scan<T>(prompt: &str) -> T where T: std::str::FromStr {
   loop {
-    let x: Option<T> = readline().parse().ok();
+    let x: Option<T> = readline(prompt).parse().ok();
     if let Some(x) = x {
       return x;
     }
-    println!("\x1B[1;31mInvalid input!\x1B[m");
+    println!("\x1B[0;1;31mInvalid input!\x1B[m");
   }
 }
 
 fn change_message(user: &UserSession) {
-  print!("Type message: ");
-  std::io::stdout().flush().unwrap();
-  let message = readline();
+  let message = readline("Type message: ");
   let mut ostream = user.ostream().unwrap();
   if message.len() > 0 {
     ostream.write(&message).unwrap();
@@ -35,7 +35,10 @@ fn change_message(user: &UserSession) {
 
 fn main_menu(user: &UserSession) {
   loop {
-    let msg = user.istream().unwrap().read::<String>();
+    let msg = match user.istream().unwrap().read::<String>() {
+      Some(msg) => format!("Message: '{}'", msg),
+      None => "* No message *".to_string(),
+    };
     print!(
       "\n\n\n=== MENU ===\n\
       \n\
@@ -43,15 +46,10 @@ fn main_menu(user: &UserSession) {
       \n\
       1. Change message\n\
       0. Logout\n\
-      \n\
-      Option: ",
-      match msg {
-        Some(msg) => format!("Message: '{}'", msg),
-        None => "* No message *".to_string(),
-      }
+      \n",
+      msg
     );
-    std::io::stdout().flush().unwrap();
-    let option: i32 = scan();
+    let option: i32 = scan("Option: ");
     match option {
       1 => change_message(user),
       0 => break,
@@ -61,12 +59,8 @@ fn main_menu(user: &UserSession) {
 }
 
 fn login() {
-  print!("Username: ");
-  std::io::stdout().flush().unwrap();
-  let username = readline();
-  print!("Password: \x1B[8m");
-  std::io::stdout().flush().unwrap();
-  let password = readline();
+  let username = readline("Username: ");
+  let password = readline("Password: \x1B[8m");
   println!("\x1B[m");
   
   let user = match serial::UserSession::authenticate(&username, &password) {
@@ -81,12 +75,8 @@ fn login() {
 }
 
 fn signup() {
-  print!("Username: ");
-  std::io::stdout().flush().unwrap();
-  let username = readline();
-  print!("Password: \x1B[8m");
-  std::io::stdout().flush().unwrap();
-  let password = readline();
+  let username = readline("Username: ");
+  let password = readline("Password: \x1B[8m");
   println!("\x1B[m");
   
   let user = match serial::UserSession::create(&username, &password) {
@@ -108,11 +98,9 @@ pub fn start() {
       1. Login\n\
       2. Signup\n\
       0. Exit\n\
-      \n\
-      Option: "
+      \n"
     );
-    std::io::stdout().flush().unwrap();
-    let option: i32 = scan();
+    let option: i32 = scan("Option: ");
     match option {
       1 => login(),
       2 => signup(),
