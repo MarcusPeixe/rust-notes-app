@@ -1,0 +1,5 @@
+/.vscode/
+/target/
+/users/*
+!/users/teste.data
+
