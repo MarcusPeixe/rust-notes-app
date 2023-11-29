@@ -1,6 +1,7 @@
 use std::fs::remove_file;
 
 use crate::serial::*;
+use crate::user_session::*;
 
 #[test]
 fn test_key1() {
