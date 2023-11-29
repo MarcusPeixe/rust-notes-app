@@ -1,10 +1,20 @@
 use crate::serial::*;
 
+/// # Serializable
+/// 
+/// This trait is used to serialize and deserialize data. It is used with the
+/// InputStream and OutputStream structs.
 pub trait Serializable {
+  /// ## serialize
+  /// 
+  /// This function serializes the data and writes it to the OutputStream.
   fn serialize(&self, ostream: &mut OutputStream) -> Option<()>;
+
+  /// ## deserialize
+  /// 
+  /// This function deserializes the data and reads it from the InputStream.
   fn deserialize(istream: &mut InputStream) -> Option<Self>
-  where
-    Self: Sized;
+  where Self: Sized;
 }
 
 impl Serializable for String {

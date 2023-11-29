@@ -1,15 +1,25 @@
 use crate::serial::*;
 
+#[doc(hidden)]
 const INITIAL: u64 = 0x3D9CA05D5422EDE9;
+#[doc(hidden)]
 const SCRAMBLE: u64 = 0xECD96C09EEFC5F6D;
+#[doc(hidden)]
 const MULT: u64 = 709;
 
+/// # Key
+/// 
+/// This struct is used to encrypt and decrypt data. It is a `u64` value
+/// generated from a password.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Key {
   pub(crate) value: u64,
 }
 
 impl Key {
+  /// ## from
+  /// 
+  /// This function generates a key from a password.
   pub fn from(password: &str) -> Key {
     let mut value: u64 = INITIAL;
     for c in password.bytes() {
